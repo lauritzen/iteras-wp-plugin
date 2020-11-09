@@ -48,6 +48,9 @@ class Iteras {
     add_shortcode( 'iteras-ordering', array( $this, 'ordering_shortcode') );
     add_shortcode( 'iteras-paywall-login', array( $this, 'paywall_shortcode') );
     add_shortcode( 'iteras-selfservice', array( $this, 'selfservice_shortcode') );
+    add_shortcode( 'iteras-if-logged-in-link', array( $this, 'if_logged_in_link_shortcode') );
+    add_shortcode( 'iteras-if-logged-in', array( $this, 'if_logged_in_shortcode') );
+    add_shortcode( 'iteras-if-not-logged-in', array( $this, 'if_not_logged_in_shortcode') );
 
     add_shortcode( 'iteras-paywall-content', array( $this, 'paywall_content_shortcode') );
 
@@ -533,5 +536,86 @@ class Iteras {
     $parsed['query'] .= $iterasnext;
 
     return unparse_url($parsed);
-  }  
+  }
+
+  // [iteras-if-logged-in-link][/iteras-if-logged-in-link]
+  function if_logged_in_link_shortcode($attrs = array(), $content = null) {
+    $attrs = shortcode_atts(
+      array(
+        'not_logged_in_text'   => __('You need to be logged in to see this content'),
+        'paywallid'       => '',
+      ),
+      $attrs,
+      'if_logged_in_link_shortcode'
+    );
+
+    $paywall_ids = array();
+    if (!empty($attrs['paywallid'])) {
+      $paywall_ids = explode(',', $attrs['paywallid']);
+    }
+
+    if (current_user_can('edit_pages')) {
+
+      $admin_paywall_notice = '<div class="iteras-paywall-notice">';
+      $admin_paywall_notice .= '<strong>' . __("This content is paywalled") . '</strong>';
+
+      if (empty($paywall_ids)) {
+        $admin_paywall_notice .= '<br>';
+        $admin_paywall_notice .= '<em>' . __("paywallid not declared") . '</em>';
+      }
+
+      $admin_paywall_notice .= '<br>' . __("You are seeing the content because you are logged into WordPress admin");
+      $admin_paywall_notice .= '</div>';
+
+      $content = $admin_paywall_notice . $content;
+    } else {
+
+      if ($this->pass_authorized($_COOKIE['iteraspass'], $paywall_ids, $this->settings['api_key']) == true) {
+        // User has access
+      } else {
+        // No access
+        $content = '<a class="iteras-login-link" href="' . $this->settings['user_url'] . '">' . $attrs['not_logged_in_text'] . '</a>';
+      }
+    }
+
+    return $content;
+  }
+
+  // [iteras-if-logged-in][/iteras-if-logged-in]
+  function if_logged_in_shortcode($attrs = array(), $content = null) {
+    return $this->content_by_login_status( 'if_logged_in_shortcode', true, $attrs, $content );
+  }
+
+  // [iteras-if-not-logged-in][/iteras-if-not-logged-in]
+  function if_not_logged_in_shortcode($attrs = array(), $content = null) {
+    return $this->content_by_login_status( 'if_not_logged_in_shortcode', false, $attrs, $content );
+  }
+
+  function content_by_login_status($shortcode, $show_if_logged_in, $attrs = array(), $content = null) {
+    $attrs = shortcode_atts(
+      array(
+        'paywallid'       => '',
+      ),
+      $attrs,
+      $shortcode
+    );
+
+    $paywall_ids = array();
+    if (!empty($attrs['paywallid'])) {
+      $paywall_ids = explode(',', $attrs['paywallid']);
+    }
+
+    if (current_user_can('edit_pages')) {
+      $admin_paywall_notice = __("You are seeing the content because you are logged into WordPress admin");
+      $content = $admin_paywall_notice . $content;
+    } else {
+      if ($this->pass_authorized($_COOKIE['iteraspass'], $paywall_ids, $this->settings['api_key']) == $show_if_logged_in) {
+        // Returns the content without manipulation
+      } else {
+        $content = '';
+      }
+    }
+
+    return $content;
+  }
 }
