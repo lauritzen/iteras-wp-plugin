@@ -2,7 +2,7 @@
 Tags: paywall, subscribe, subscriptions, subscription, subscribers, access-control, paid content, premium, premium content, monetize, magazine, media pass, registration, billing, membership, member, earn money
 Requires at least: 3.5.1
 Tested up to: 5.5.1
-Stable tag: 1.3.5
+Stable tag: 1.3.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -52,6 +52,8 @@ You can insert a selfservice iframe to allow subscribers to manage their subscri
 
 These shortcodes, except [iteras-return-to-page], are internally converted to calls to the ITERAS Javascript API. You can pass more parameters if you need to, e.g. `next`, see the [API documentation](https://app.iteras.dk/api/) for more details. The profile parameter is implicit and comes from your plugin settings.
 
+There's a few shortcodes for controlling content based on the users logged in status. For showing content when the user has access use `[iteras-if-logged-in paywallid="abc123,def456"]Content only shown if the user is logged in and has access[/iteras-if-logged-in]`. `[iteras-if-not-logged-in]` does the opposite. `[iteras-if-logged-in-link]Content[/iteras-if-logged-in-link]` will automatically insert a link to the subscriber landing page that is configured with the plugin, alternatively a `url` attribute can be supplied, while `login_text` can we used to customize the link text. These shortcodes only work with server validation enabled.
+
 = My visitors don't return to the page they came from after having signed up? =
 
 When you link to other pages, you may be losing the return information needed to redirect the visitors. Send the URL through [iteras-return-to-page] as described above to forward the return information.
@@ -68,7 +70,11 @@ You will need to do a custom integration. The plugin attaches to the `the_conten
 
 In this case set the "Paywall integration method" to "Custom" and add the paywall code manually to the theme or plugin you are using. This can be done either by wrapping the post body with the shortcode `[iteras-paywall-content]...[/iteras-paywall-content]` or by calling `Iteras::get_instance().potentially_paywall_content(...)` which returns the content wrapped with the paywall.
 
+
 == Changelog ==
+= 1.3.6 =
+* Added `[iteras-if-logged-in]`, `[iteras-if-not-logged-in]` and `[iteras-if-logged-in-link]` shortcodes for controlling content based on logged in status
+
 = 1.3.5 =
 * Added filter (`after_paywall_script_prepared_except_redirect`) of the prepared paywall script before adding to the end of content
 

@@ -5,8 +5,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: iteras\n"
 "Report-Msgid-Bugs-To: team@iteras.dk\n"
-"POT-Creation-Date: 2019-03-05 14:07+0100\n"
-"PO-Revision-Date: 2019-03-05 13:51+0100\n"
+"POT-Creation-Date: 2020-11-12 17:49+0100\n"
+"PO-Revision-Date: 2020-11-12 17:49+0100\n"
 "Last-Translator: Ole Laursen <olau@iteras.dk>\n"
 "Language-Team: da\n"
 "Language: da\n"
@@ -42,11 +42,11 @@ msgstr "ITERAS-paywall"
 msgid "Paywall"
 msgstr "Betalingsmur"
 
-#: admin/iteras-admin.php:133
+#: admin/iteras-admin.php:134
 msgid "Does not restrict visitors, everyone can see the content"
 msgstr "Begrænser ingen besøgende, alle kan se indholdet"
 
-#: admin/iteras-admin.php:134
+#: admin/iteras-admin.php:135
 msgid ""
 "Content restricted to visitors who are in the subscriber database (but they "
 "are not required to have an active subscription)"
@@ -54,27 +54,27 @@ msgstr ""
 "Indhold begrænset til besøgende i abonnentdatabasen (men de behøver ikke "
 "have et aktivt abonnement)"
 
-#: admin/iteras-admin.php:135
+#: admin/iteras-admin.php:136
 msgid "Content restricted to visitors with an active subscription"
 msgstr "Indhold begrænset til besøgende i abonnentdatabasen"
 
-#: admin/iteras-admin.php:203
+#: admin/iteras-admin.php:204
 msgid "ITERAS configuration"
 msgstr "ITERAS-konfiguration"
 
-#: admin/iteras-admin.php:204
+#: admin/iteras-admin.php:205
 msgid "ITERAS"
 msgstr "ITERAS"
 
-#: admin/iteras-admin.php:243
+#: admin/iteras-admin.php:244
 msgid "Synchronization of paywalls from ITERAS complete"
 msgstr "Synkronisering af betalingsmure fra ITERAS gennemført"
 
-#: admin/iteras-admin.php:249
+#: admin/iteras-admin.php:250
 msgid "Couldn't synchronize paywalls from ITERAS"
 msgstr "Kunne ikke synkronisere betalingsmure fra ITERAS"
 
-#: admin/iteras-admin.php:281
+#: admin/iteras-admin.php:282
 msgid "Settings"
 msgstr "Indstillinger"
 
@@ -202,13 +202,13 @@ msgid ""
 "Present ordering offers and a login option. If you link to separate ordering "
 "and login pages, run the URL through the shortcode [iteras-return-to-page], "
 "e.g. &lta href=\"[iteras-return-to-page url='/?page_id=2']&gt;sign up here!"
-"&lt;a&gt;\" to let the visitor return to the same page after ordering or "
+"&lt;/a&gt;\" to let the visitor return to the same page after ordering or "
 "logging in."
 msgstr ""
 "Præsenter bestillingstilbud og en logind-mulighed. Hvis du linker til "
 "separate bestillings- og logind-sider, så kør URL'en gennem [iteras-return-"
 "to-page], f.eks. &lta href=\"[iteras-return-to-page url='/?page_id=2']&gt;"
-"bestil her!&lt;a&gt;\" for at lade den besøgende komme tilbage til samme "
+"bestil her!&lt;/a&gt;\" for at lade den besøgende komme tilbage til samme "
 "side efter at have bestilt eller logget ind."
 
 #: admin/views/admin.php:107
@@ -281,18 +281,27 @@ msgstr ""
 "ITERAS-indstillingerne er ikke blevet udfyldt korrekt. Gå til <a href='%url"
 "%'>siden med indstillinger</a> for at rette dem."
 
-#: public/iteras-public.php:397
+#: public/iteras-public.php:402 public/iteras-public.php:569
 msgid "This content is paywalled"
 msgstr "Dette indhold er bag betalingsmur"
 
-#: public/iteras-public.php:397
-msgid "You are seeing the content because you are logged into WordPress admin"
-msgstr "Du ser indholdet da du er logget ind i WordPress admin"
+#: public/iteras-public.php:402 public/iteras-public.php:576
+#: public/iteras-public.php:624
+msgid "You are seeing the content because you are logged into WordPress admin."
+msgstr "Du ser indholdet da du er logget ind i WordPress admin."
 
-#: public/iteras-public.php:406
+#: public/iteras-public.php:411
 msgid "ITERAS plugin improperly configured. Paywall box content is missing"
 msgstr ""
 "ITERAS-plugin er ikke konfigureret rigtigt. Call to action-indhold mangler."
+
+#: public/iteras-public.php:550
+msgid "You need to be logged in to see this content"
+msgstr "Du skal være logget ind for at se indholdet"
+
+#: public/iteras-public.php:573
+msgid "paywallid not declared"
+msgstr "paywallid ikke udfyldt"
 
 #~ msgid "Paying subscribers"
 #~ msgstr "Betalende abonnenter"

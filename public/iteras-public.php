@@ -15,7 +15,7 @@
  */
 class Iteras {
 
-  const VERSION = '1.3.5';
+  const VERSION = '1.3.6';
 
   const SETTINGS_KEY = "iteras_settings";
   const POST_META_KEY = "iteras_paywall";
@@ -399,7 +399,7 @@ class Iteras {
     $extra = "";
     // show message without paywall for editors
     if (current_user_can('edit_pages') && !empty($paywall_ids)) {
-      $content = '<div class="iteras-paywall-notice"><b>'.__("This content is paywalled").'</b><br>'.__("You are seeing the content because you are logged into WordPress admin").'</div>'.$content;
+      $content = '<div class="iteras-paywall-notice"><b>'.__("This content is paywalled").'</b><br>'.__("You are seeing the content because you are logged into WordPress admin.").'</div>'.$content;
     }
     // paywall the content
     else if (!empty($paywall_ids)) {
@@ -470,6 +470,10 @@ class Iteras {
       return "";
   }
 
+  function parse_paywall_ids($paywall_ids) {
+    $paywall_ids = preg_replace('/\s*,\s*/', ',', filter_var($paywall_ids, FILTER_SANITIZE_STRING));
+    return explode(',', $paywall_ids);
+  }
 
   // [iteras-paywall-content]...[/iteras-paywall-content]
   function paywall_content_shortcode($attrs, $content = null) {
@@ -497,10 +501,7 @@ class Iteras {
   // [iteras-paywall-login paywallid="abc123,def456"]
   function paywall_shortcode($attrs) {
     if (!empty($attrs) && in_array('paywallid', $attrs)) {
-      $paywall_ids = $attrs['paywallid'];
-      $paywall_ids = preg_replace('/\s*,\s*/', ',', filter_var($paywall_ids, FILTER_SANITIZE_STRING));
-      $paywall_ids = explode(',', $paywall_ids);
-      $attrs['paywallid'] = $paywall_ids;
+      $attrs['paywallid'] = $this->parse_paywall_ids($attrs['paywallid']);
     }
     else {
       $attrs['paywallid'] = $this->get_paywall_ids();
@@ -538,12 +539,17 @@ class Iteras {
     return unparse_url($parsed);
   }
 
-  // [iteras-if-logged-in-link][/iteras-if-logged-in-link]
+  // [iteras-if-logged-in-link paywallid="abc123,def456" url="/?p=1" login_text="You need an account"][/iteras-if-logged-in-link]
   function if_logged_in_link_shortcode($attrs = array(), $content = null) {
+    if (!$this->settings['paywall_server_side_validation']) {
+      return '<!-- ITERAS server validation needed to use this shortcode -->' . $content;
+    }
+
     $attrs = shortcode_atts(
       array(
-        'not_logged_in_text'   => __('You need to be logged in to see this content'),
-        'paywallid'       => '',
+        'login_text' => __('You need to be logged in to see this content'),
+        'paywallid' => '',
+        'url' => $this->settings['subscribe_url'],
       ),
       $attrs,
       'if_logged_in_link_shortcode'
@@ -551,7 +557,10 @@ class Iteras {
 
     $paywall_ids = array();
     if (!empty($attrs['paywallid'])) {
-      $paywall_ids = explode(',', $attrs['paywallid']);
+      $paywall_ids = $this->parse_paywall_ids($attrs['paywallid']);
+    }
+    else {
+      $paywall_ids = $this->get_paywall_ids();
     }
 
     if (current_user_can('edit_pages')) {
@@ -564,52 +573,57 @@ class Iteras {
         $admin_paywall_notice .= '<em>' . __("paywallid not declared") . '</em>';
       }
 
-      $admin_paywall_notice .= '<br>' . __("You are seeing the content because you are logged into WordPress admin");
+      $admin_paywall_notice .= '<br>' . __("You are seeing the content because you are logged into WordPress admin.");
       $admin_paywall_notice .= '</div>';
 
       $content = $admin_paywall_notice . $content;
     } else {
-
-      if ($this->pass_authorized($_COOKIE['iteraspass'], $paywall_ids, $this->settings['api_key']) == true) {
+      if (isset($_COOKIE['iteraspass']) && $this->pass_authorized($_COOKIE['iteraspass'], $paywall_ids, $this->settings['api_key'])) {
         // User has access
       } else {
         // No access
-        $content = '<a class="iteras-login-link" href="' . $this->settings['user_url'] . '">' . $attrs['not_logged_in_text'] . '</a>';
+        $content = '<a class="iteras-login-link" href="' . $this->return_to_page_shortcode(array( 'url' => $attrs['url'] )) . '">' . $attrs['login_text'] . '</a>';
       }
     }
 
     return $content;
   }
 
-  // [iteras-if-logged-in][/iteras-if-logged-in]
+  // [iteras-if-logged-in paywallid="abc123,def456"][/iteras-if-logged-in]
   function if_logged_in_shortcode($attrs = array(), $content = null) {
     return $this->content_by_login_status( 'if_logged_in_shortcode', true, $attrs, $content );
   }
 
-  // [iteras-if-not-logged-in][/iteras-if-not-logged-in]
+  // [iteras-if-not-logged-in paywallid="abc123,def456"][/iteras-if-not-logged-in]
   function if_not_logged_in_shortcode($attrs = array(), $content = null) {
     return $this->content_by_login_status( 'if_not_logged_in_shortcode', false, $attrs, $content );
   }
 
-  function content_by_login_status($shortcode, $show_if_logged_in, $attrs = array(), $content = null) {
+  function content_by_login_status($shortcode_name, $show_if_logged_in, $attrs = array(), $content = null) {
+    if (!$this->settings['paywall_server_side_validation']) {
+      return '<!-- ITERAS server validation needed to use this shortcode -->' . $content;
+    }
+
     $attrs = shortcode_atts(
       array(
-        'paywallid'       => '',
+        'paywallid' => '',
       ),
       $attrs,
-      $shortcode
+      $shortcode_name
     );
 
     $paywall_ids = array();
     if (!empty($attrs['paywallid'])) {
-      $paywall_ids = explode(',', $attrs['paywallid']);
+      $paywall_ids = $this->parse_paywall_ids($attrs['paywallid']);
+    }
+    else {
+      $paywall_ids = $this->get_paywall_ids();
     }
 
     if (current_user_can('edit_pages')) {
-      $admin_paywall_notice = __("You are seeing the content because you are logged into WordPress admin");
-      $content = $admin_paywall_notice . $content;
+      $content = __("You are seeing the content because you are logged into WordPress admin.") . $content;
     } else {
-      if ($this->pass_authorized($_COOKIE['iteraspass'], $paywall_ids, $this->settings['api_key']) == $show_if_logged_in) {
+      if ((isset($_COOKIE['iteraspass']) && $this->pass_authorized($_COOKIE['iteraspass'], $paywall_ids, $this->settings['api_key'])) == $show_if_logged_in) {
         // Returns the content without manipulation
       } else {
         $content = '';
