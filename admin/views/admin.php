@@ -99,7 +99,7 @@
         <th scope="row"><label for="paywall_box"><?php _e('Call-to-action content', $domain); ?></label></th>
         <td>
           <?php wp_editor($settings['paywall_box'], "paywall_box"); ?>
-          <p class="description"><?php _e('Present ordering offers and a login option. If you link to separate ordering and login pages, run the URL through the shortcode [iteras-return-to-page], e.g. &lta href="[iteras-return-to-page url=\'/?page_id=2\']&gt;sign up here!&lt;a&gt;" to let the visitor return to the same page after ordering or logging in.', $domain); ?></p>
+          <p class="description"><?php _e('Present ordering offers and a login option. If you link to separate ordering and login pages, run the URL through the shortcode [iteras-return-to-page], e.g. &lta href="[iteras-return-to-page url=\'/?page_id=2\']&gt;sign up here!&lt;/a&gt;" to let the visitor return to the same page after ordering or logging in.', $domain); ?></p>
         </td>
       </tr>
 

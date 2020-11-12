@@ -12,7 +12,7 @@
  * Plugin Name:       ITERAS
  * Plugin URI:        https://app.iteras.dk
  * Description:       Integration with ITERAS, a cloud-based state-of-the-art system for managing subscriptions/memberships and payments.
- * Version:           1.3.5
+ * Version:           1.3.6
  * Author:            ITERAS
  * Author URI:        https://www.iteras.dk
  * Text Domain:       iteras
